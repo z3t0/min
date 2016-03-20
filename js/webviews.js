@@ -42,12 +42,12 @@ function onPageLoad(e) {
 	var url = this.getAttribute("src"); //src attribute changes whenever a page is loaded
 
 	if (url.indexOf("https://") === 0 || url.indexOf("about:") == 0 || url.indexOf("chrome:") == 0 || url.indexOf("file://") == 0) {
-		tabs.update(tab, {
+		currentTask.tabs.update(tab, {
 			secure: true,
 			url: url,
 		});
 	} else {
-		tabs.update(tab, {
+		currentTask.tabs.update(tab, {
 			secure: false,
 			url: url,
 		});
@@ -82,7 +82,7 @@ function getWebviewDom(options) {
 
 	//if the tab is private, we want to partition it. See http://electron.atom.io/docs/v0.34.0/api/web-view-tag/#partition
 	//since tab IDs are unique, we can use them as partition names
-	if (tabs.get(options.tabId).private == true) {
+	if (currentTask.tabs.get(options.tabId).private == true) {
 		var partition = options.tabId.toString(); //options.tabId is a number, which remote.session.fromPartition won't accept. It must be converted to a string first
 
 		w.setAttribute("partition", partition);
@@ -110,7 +110,7 @@ function getWebviewDom(options) {
 
 	w.addEventListener("page-title-set", function (e) {
 		var tab = this.getAttribute("data-tab");
-		tabs.update(tab, {
+		currentTask.tabs.update(tab, {
 			title: e.title
 		});
 		rerenderTabElement(tab);
@@ -127,11 +127,11 @@ function getWebviewDom(options) {
 
 	w.addEventListener("new-window", function (e) {
 		var tab = this.getAttribute("data-tab");
-		var currentIndex = tabs.getIndex(tabs.getSelected());
+		var currentIndex = currentTask.tabs.getIndex(currentTask.tabs.getSelected());
 
-		var newTab = tabs.add({
+		var newTab = currentTask.tabs.add({
 			url: e.url,
-			private: tabs.get(tab).private //inherit private status from the current tab
+			private: currentTask.tabs.get(tab).private //inherit private status from the current tab
 		}, currentIndex + 1);
 		addTab(newTab, {
 			enterEditMode: false,
@@ -141,9 +141,9 @@ function getWebviewDom(options) {
 
 	w.addEventListener("close", function (e) {
 		var tabId = this.getAttribute("data-tab");
-		var selTab = tabs.getSelected();
-		var currentIndex = tabs.getIndex(tabId);
-		var nextTab = tabs.getAtIndex(currentIndex - 1) || tabs.getAtIndex(currentIndex + 1);
+		var selTab = currentTask.tabs.getSelected();
+		var currentIndex = currentTask.tabs.getIndex(tabId);
+		var nextTab = currentTask.tabs.getAtIndex(currentIndex - 1) || currentTask.tabs.getAtIndex(currentIndex + 1);
 
 		destroyTab(tabId);
 
@@ -183,7 +183,7 @@ function getWebviewDom(options) {
 		var tabId = this.getAttribute("data-tab");
 
 		destroyWebview(tabId);
-		tabs.update(tabId, {
+		currentTask.tabs.update(tabId, {
 			url: crashedWebviewPage
 		});
 
@@ -216,7 +216,7 @@ var WebviewsWithHiddenClass = false;
 
 function addWebview(tabId) {
 
-	var tabData = tabs.get(tabId);
+	var tabData = currentTask.tabs.get(tabId);
 
 	var webview = getWebviewDom({
 		tabId: tabId,
@@ -228,6 +228,8 @@ function addWebview(tabId) {
 	webview.classList.add("hidden");
 
 	webviewBase.appendChild(webview);
+
+	return webview;
 }
 
 function switchToWebview(id) {
@@ -237,6 +239,11 @@ function switchToWebview(id) {
 	}
 
 	var wv = getWebview(id);
+
+	if (!wv) {
+		wv = addWebview(id);
+	}
+
 	wv.classList.remove("hidden");
 	wv.hidden = false;
 }

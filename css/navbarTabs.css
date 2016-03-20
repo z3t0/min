@@ -149,7 +149,7 @@ body.notMac .tab-group {
 
 /* buttons */
 
-#add-tab-button {
+.navbar-action-button {
 	padding: 1em;
 }
 
@@ -166,7 +166,7 @@ body.notMac .tab-group {
 .tab-item.active .reader-button.is-reader {
 	display: block;
 }
-
+<<<<<<< ac39bcacbde40a2ab2a42241be6d51d523d7a932
 /* when the tab is hovered, hide info buttons and show the close button */
 
 .tab-item.jshover .tab-info-icon {

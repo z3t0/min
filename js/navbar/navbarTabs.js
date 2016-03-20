@@ -1,11 +1,7 @@
-var tabContainer = document.getElementsByClassName("tab-group")[0];
-var tabGroup = tabContainer.querySelector("#tabs"); //TODO these names are confusing
+var navbar = document.getElementsByClassName("tab-group")[0];
+var tabContainer = navbar.querySelector("#tabs");
 
-/* tab events */
-
-var lastTabDeletion = 0;
-
-/* draws tabs and manages tab events */
+var lastTabDeletion = 0; //this is used in the tab event listeners
 
 function getTabInput(tabId) {
 	return document.querySelector('.tab-item[data-tab="{id}"] .tab-input'.replace("{id}", tabId));
@@ -25,26 +21,30 @@ function setActiveTabElement(tabId) {
 	var el = getTabElement(tabId);
 	el.classList.add("active");
 
-	if (tabs.count() > 1) { //if there is only one tab, we don't need to indicate which one is selected
+	if (currentTask.tabs.count() > 1) { //if there is only one tab, we don't need to indicate which one is selected
 		el.classList.add("has-highlight");
 	} else {
 		el.classList.remove("has-highlight");
 	}
 
-	if (!isExpandedMode) {
-
-		requestIdleCallback(function () {
-			requestAnimationFrame(function () {
-				el.scrollIntoView({
-					behavior: "smooth"
-				});
+	requestIdleCallback(function () {
+		requestAnimationFrame(function () {
+			el.scrollIntoView({
+				behavior: "smooth"
 			});
-		}, {
-			timeout: 1500
 		});
+	}, {
+		timeout: 1500
+	});
 
+}
+
+//redraws all of the tabs in the tabstrip
+function rerenderTabstrip() {
+	empty(tabContainer);
+	for (var i = 0; i < currentTask.tabs.length; i++) {
+		tabContainer.appendChild(createTabElement(currentTask.tabs[i]));
 	}
-
 }
 
 function leaveTabEditMode(options) {
@@ -58,7 +58,7 @@ function leaveTabEditMode(options) {
 			input.blur();
 		}
 	}
-	tabGroup.classList.remove("has-selected-tab");
+	tabContainer.classList.remove("has-selected-tab");
 	hidesearchbar();
 }
 
@@ -66,19 +66,18 @@ function enterEditMode(tabId) {
 
 	leaveExpandedMode();
 
-	var tabEl = getTabElement(tabId);
-	var webview = getWebview(tabId);
+	var tabEl = getTabElement(tabId),
+		webview = getWebview(tabId),
+		input = getTabInput(tabId);
 
-	var currentURL = tabs.get(tabId).url;
+	var currentURL = currentTask.tabs.get(tabId).url;
 
 	if (currentURL == "about:blank") {
 		currentURL = "";
 	}
 
-	var input = getTabInput(tabId);
-
 	tabEl.classList.add("selected");
-	tabGroup.classList.add("has-selected-tab");
+	tabContainer.classList.add("has-selected-tab");
 
 	input.value = currentURL;
 	input.focus();
@@ -96,15 +95,15 @@ function enterEditMode(tabId) {
 
 function rerenderTabElement(tabId) {
 	var tabEl = getTabElement(tabId),
-		tabData = tabs.get(tabId);
+		tabData = currentTask.tabs.get(tabId);
 
-	var tabTitle = tabData.title || "New Tab";
-	var title = tabEl.querySelector(".tab-view-contents .title");
+	var tabTitle = tabData.title || "New Tab",
+		titleElement = tabEl.querySelector(".tab-view-contents .title");
 
-	title.textContent = tabTitle;
-	title.title = tabTitle;
+	titleElement.textContent = tabTitle;
+	titleElement.title = tabTitle;
 
-	var secIcon = tabEl.getElementsByClassName("icon-tab-not-secure")[0];
+	var notSecureIcon = tabEl.getElementsByClassName("icon-tab-not-secure")[0];
 
 	if (tabData.secure === false) {
 		if (!secIcon) {
@@ -119,15 +118,14 @@ function rerenderTabElement(tabId) {
 	bookmarks.renderStar(tabId);
 }
 
-function createTabElement(tabId) {
-	var data = tabs.get(tabId),
-		url = urlParser.parse(data.url);
+function createTabElement(tabData) {
+	var url = urlParser.parse(tabData.url);
 
 	var tabEl = document.createElement("div");
 	tabEl.className = "tab-item";
-	tabEl.setAttribute("data-tab", tabId);
+	tabEl.setAttribute("data-tab", tabData.id);
 
-	if (data.private) {
+	if (tabData.private) {
 		tabEl.classList.add("private-tab");
 	}
 
@@ -149,14 +147,15 @@ function createTabElement(tabId) {
 	input.value = url;
 
 	ec.appendChild(input);
-	ec.appendChild(bookmarks.getStar(tabId));
+	ec.appendChild(bookmarks.getStar(tabData.id));
 
 	tabEl.appendChild(ec);
 
 	var vc = document.createElement("div");
 	vc.className = "tab-view-contents";
-	vc.appendChild(readerView.getButton(tabId));
+	vc.appendChild(readerView.getButton(tabData.id));
 
+	<< << << < ac39bcacbde40a2ab2a42241be6d51d523d7a932
 	//icons
 
 	var iconArea = document.createElement("span");
@@ -188,7 +187,7 @@ function createTabElement(tabId) {
 
 	var title = document.createElement("span");
 	title.className = "title";
-	title.textContent = data.title || "New Tab";
+	title.textContent = tabData.title || "New Tab";
 
 	vc.appendChild(title);
 
@@ -219,7 +218,7 @@ function createTabElement(tabId) {
 			openURLFromsearchbar(e, this.value);
 
 			//focus the webview, so that autofocus inputs on the page work
-			getWebview(tabs.getSelected()).focus();
+			getWebview(currentTask.tabs.getSelected()).focus();
 
 		} else if (e.keyCode == 9) {
 			return;
@@ -257,7 +256,7 @@ function createTabElement(tabId) {
 		var tabId = this.getAttribute("data-tab");
 
 		//if the tab isn't focused
-		if (tabs.getSelected() != tabId) {
+		if (currentTask.tabs.getSelected() != tabId) {
 			switchToTab(tabId);
 		} else if (!isExpandedMode) { //the tab is focused, edit tab instead
 			enterEditMode(tabId);
@@ -266,28 +265,27 @@ function createTabElement(tabId) {
 	});
 
 	tabEl.addEventListener("mousewheel", function (e) {
-		if (e.deltaY > 65 && e.deltaX < 10 && Date.now() - lastTabDeletion > 650) { //swipe up to delete tabs
+			if (e.deltaY > 65 && e.deltaX < 10 && Date.now() - lastTabDeletion > 650) { //swipe up to delete tabs
 
-			lastTabDeletion = Date.now();
+				lastTabDeletion = Date.now();
 
-			/* tab deletion is disabled in focus mode */
-			if (isFocusMode) {
-				showFocusModeError();
-				return;
-			}
+				/* tab deletion is disabled in focus mode */
+				if (isFocusMode) {
+					showFocusModeError();
+					return;
+				}
 
-			var tab = this.getAttribute("data-tab");
-			this.style.transform = "translateY(-100%)";
+				var tab = this.getAttribute("data-tab");
+				this.style.transform = "translateY(-100%)";
 
-			setTimeout(function () {
-				closeTab(tab);
-			}, 150); //wait until the animation has completed
+				setTimeout(function () closeTab(tab);
+				}, 150); //wait until the animation has completed
 		}
 	});
 
-	tabEl.addEventListener("mouseenter", handleExpandedModeTabItemHover);
+tabEl.addEventListener("mouseenter", handleExpandedModeTabItemHover);
 
-	return tabEl;
+return tabEl;
 }
 
 function addTab(tabId, options) {
@@ -306,19 +304,19 @@ function addTab(tabId, options) {
 		leaveTabEditMode(); //if a tab is in edit-mode, we want to exit it
 	}
 
-	tabId = tabId || tabs.add();
+	tabId = tabId || currentTask.tabs.add();
 
-	var tab = tabs.get(tabId);
+	var tab = currentTask.tabs.get(tabId);
 
 	//use the correct new tab colors
 
 	if (tab.private && !tab.backgroundColor) {
-		tabs.update(tabId, {
+		currentTask.tabs.update(tabId, {
 			backgroundColor: defaultColors.private[0],
 			foregroundColor: defaultColors.private[1]
 		});
 	} else if (!tab.backgroundColor) {
-		tabs.update(tabId, {
+		currentTask.tabs.update(tabId, {
 			backgroundColor: defaultColors.regular[0],
 			foregroundColor: defaultColors.regular[1]
 		});
@@ -326,11 +324,11 @@ function addTab(tabId, options) {
 
 	findinpage.end();
 
-	var index = tabs.getIndex(tabId);
+	var index = currentTask.tabs.getIndex(tabId);
 
-	var tabEl = createTabElement(tabId);
+	var tabEl = createTabElement(tab);
 
-	tabGroup.insertBefore(tabEl, tabGroup.childNodes[index]);
+	tabContainer.insertBefore(tabEl, tabContainer.childNodes[index]);
 
 	addWebview(tabId);
 
