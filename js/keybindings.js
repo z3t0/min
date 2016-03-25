@@ -88,7 +88,32 @@ require.async("mousetrap", function (Mousetrap) {
 		e.preventDefault();
 		e.stopImmediatePropagation();
 
+<<<<<<< b6333073d30484380f5b85e70402479961fbfbb2
 		closeTab(tabs.getSelected());
+=======
+
+		/* disabled in focus mode */
+		if (isFocusMode) {
+			showFocusModeError();
+			return;
+		}
+
+		var currentTab = currentTask.tabs.getSelected();
+		var currentIndex = currentTask.tabs.getIndex(currentTab);
+		var nextTab = currentTask.tabs.getAtIndex(currentIndex - 1) || currentTask.tabs.getAtIndex(currentIndex + 1);
+
+		destroyTab(currentTab);
+		if (nextTab) {
+			switchToTab(nextTab.id);
+		} else {
+			addTab();
+		}
+
+		//re-render the overlay to delete the tab element
+		if (taskOverlay.isShown) {
+			taskOverlay.show();
+		}
+>>>>>>> bug fixes
 
 		return false;
 	});
@@ -131,7 +156,7 @@ require.async("mousetrap", function (Mousetrap) {
 
 	Mousetrap.bind("esc", function (e) {
 		leaveTabEditMode();
-		leaveExpandedMode();
+		taskOverlay.hide();
 		if (findinpage.isEnabled) {
 			findinpage.end(); //this also focuses the webview
 		} else {
@@ -161,8 +186,6 @@ require.async("mousetrap", function (Mousetrap) {
 
 	Mousetrap.bind(["option+mod+left", "shift+ctrl+tab"], function (d) {
 
-		enterExpandedMode(); //show the detailed tab switcher
-
 		var currentIndex = currentTask.tabs.getIndex(currentTask.tabs.getSelected());
 		var previousTab = currentTask.tabs.getAtIndex(currentIndex - 1);
 
@@ -174,8 +197,6 @@ require.async("mousetrap", function (Mousetrap) {
 	});
 
 	Mousetrap.bind(["option+mod+right", "ctrl+tab"], function (d) {
-
-		enterExpandedMode();
 
 		var currentIndex = currentTask.tabs.getIndex(currentTask.tabs.getSelected());
 		var nextTab = currentTask.tabs.getAtIndex(currentIndex + 1);
@@ -197,20 +218,19 @@ require.async("mousetrap", function (Mousetrap) {
 		addTab(); //create a new, blank tab
 	});
 
-	//return exits expanded mode
+	//return hides task overlay
 
 	Mousetrap.bind("return", function () {
-		if (isExpandedMode) {
-			leaveExpandedMode();
-			getWebview(currentTask.tabs.getSelected()).focus();
+		if (taskOverlay.isShown) {
+			taskOverlay.hide();
 		}
 	});
 
 	Mousetrap.bind("shift+mod+e", function () {
-		if (!isExpandedMode) {
-			enterExpandedMode();
+		if (!taskOverlay.isShown) {
+			taskOverlay.show();
 		} else {
-			leaveExpandedMode();
+			taskOverlay.hide();
 		}
 	});
 
@@ -222,9 +242,3 @@ require.async("mousetrap", function (Mousetrap) {
 	});
 
 }); //end require mousetrap
-
-document.body.addEventListener("keyup", function (e) {
-	if (e.keyCode == 17) { //ctrl key
-		leaveExpandedMode();
-	}
-});
