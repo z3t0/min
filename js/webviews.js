@@ -254,7 +254,12 @@ function updateWebview(id, url) {
 
 function destroyWebview(id) {
 	var w = document.querySelector('webview[data-tab="{id}"]'.replace("{id}", id));
-	w.parentNode.removeChild(w);
+	if (w) {
+		w.remove();
+		return true;
+	} else {
+		return false;
+	}
 }
 
 function getWebview(id) {
