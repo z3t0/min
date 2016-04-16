@@ -27,6 +27,18 @@ function destroyTab(id) {
 
 function destroyTask(id) {
 	var task = tasks.get(id);
+<<<<<<< HEAD
+=======
+
+	task.tabs.forEach(function (tab) {
+		destroyWebview(tab.id);
+	});
+
+	tasks.destroy(id);
+}
+
+/* switches to a tab - update the webview, state, tabstrip, etc. */
+>>>>>>> origin/tasks-overlay
 
 	task.tabs.forEach(function (tab) {
 		destroyWebview(tab.id);
@@ -50,26 +62,46 @@ function closeTab(tabId) {
 
 		destroyTab(tabId);
 
+<<<<<<< HEAD
 		if (nextTab) {
 			switchToTab(nextTab.id);
 		} else {
 			addTab();
 		}
+=======
+	currentTask.tabs.setSelected(id);
+	setActiveTabElement(id);
+	switchToWebview(id);
+>>>>>>> origin/tasks-overlay
 
 	} else {
 		destroyTab(tabId);
 	}
 
+<<<<<<< HEAD
 	/* switches to a tab - update the webview, state, tabstrip, etc. */
 
 	function switchToTab(id, options) {
+=======
+	var tabData = currentTask.tabs.get(id);
+	setColor(tabData.backgroundColor, tabData.foregroundColor);
+>>>>>>> origin/tasks-overlay
 
 		options = options || {};
 
+<<<<<<< HEAD
 		/* tab switching disabled in focus mode */
 		if (isFocusMode) {
 			showFocusModeError();
 			return;
+=======
+	setTimeout(function () {
+		if (currentTask.tabs.get(id) && currentTask.tabs.getSelected() == id) {
+			currentTask.tabs.update(id, {
+				lastActivity: Date.now(),
+			});
+			tabActivity.refresh();
+>>>>>>> origin/tasks-overlay
 		}
 
 		leaveTabEditMode();

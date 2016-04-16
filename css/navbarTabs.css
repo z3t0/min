@@ -166,6 +166,7 @@ body.notMac .tab-group {
 .tab-item.active .reader-button.is-reader {
 	display: block;
 }
+<<<<<<< HEAD
 <<<<<<< ac39bcacbde40a2ab2a42241be6d51d523d7a932
 /* when the tab is hovered, hide info buttons and show the close button */
 
@@ -252,3 +253,5 @@ body.is-focus-mode #add-tab-button {
 body.is-focus-mode .tab-item.has-highlight {
 	background: none;
 }
+=======
+>>>>>>> origin/tasks-overlay

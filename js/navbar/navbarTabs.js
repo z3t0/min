@@ -106,12 +106,17 @@ function rerenderTabElement(tabId) {
 	var notSecureIcon = tabEl.getElementsByClassName("icon-tab-not-secure")[0];
 
 	if (tabData.secure === false) {
+<<<<<<< HEAD
 		if (!secIcon) {
 			var iconArea = tabEl.querySelector(".tab-icon-area");
 			iconArea.insertAdjacentHTML("beforeend", "<i class='fa fa-exclamation-triangle icon-tab-not-secure tab-info-icon' title='Your connection to this website is not secure.'></i>");
+=======
+		if (!notSecureIcon) {
+			tabEl.querySelector(".tab-view-contents").insertAdjacentHTML("afterbegin", "<i class='fa fa-exclamation-triangle icon-tab-not-secure' title='Your connection to this website is not secure.'></i>");
+>>>>>>> origin/tasks-overlay
 		}
-	} else if (secIcon) {
-		secIcon.parentNode.removeChild(secIcon);
+	} else if (notSecureIcon) {
+		notSecureIcon.parentNode.removeChild(notSecureIcon);
 	}
 
 	//update the star to reflect whether the page is bookmarked or not
@@ -154,6 +159,7 @@ function createTabElement(tabData) {
 	var vc = document.createElement("div");
 	vc.className = "tab-view-contents";
 	vc.appendChild(readerView.getButton(tabData.id));
+<<<<<<< HEAD
 
 	<< << << < ac39bcacbde40a2ab2a42241be6d51d523d7a932
 	//icons
@@ -178,6 +184,11 @@ function createTabElement(tabData) {
 
 	if (data.private) {
 		iconArea.insertAdjacentHTML("afterbegin", "<i class='fa fa-ban icon-tab-is-private tab-info-icon'></i>");
+=======
+
+	if (tabData.private) {
+		vc.insertAdjacentHTML("afterbegin", "<i class='fa fa-ban icon-tab-is-private'></i>");
+>>>>>>> origin/tasks-overlay
 		vc.setAttribute("title", "Private tab");
 	}
 
@@ -269,10 +280,32 @@ function createTabElement(tabData) {
 
 				lastTabDeletion = Date.now();
 
+<<<<<<< HEAD
 				/* tab deletion is disabled in focus mode */
 				if (isFocusMode) {
 					showFocusModeError();
 					return;
+=======
+			var tab = this.getAttribute("data-tab");
+			this.style.transform = "translateY(-100%)";
+
+			setTimeout(function () {
+
+				if (tab == currentTask.tabs.getSelected()) {
+					var currentIndex = currentTask.tabs.getIndex(currentTask.tabs.getSelected());
+					var nextTab = currentTask.tabs.getAtIndex(currentIndex - 1) || currentTask.tabs.getAtIndex(currentIndex + 1);
+
+					destroyTab(tab);
+
+					if (nextTab) {
+						switchToTab(nextTab.id);
+					} else {
+						addTab();
+					}
+
+				} else {
+					destroyTab(tab);
+>>>>>>> origin/tasks-overlay
 				}
 
 				var tab = this.getAttribute("data-tab");
