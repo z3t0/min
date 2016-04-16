@@ -146,17 +146,39 @@ module.exports = function (grunt) {
 				src: 'dist/app/Min-linux-x64',
 				dest: 'dist/app/linux'
 			}
-		}
+		},
+		'create-windows-installer': {
+			ia32: {
+				appDirectory: 'dist/app/Min-win32-ia32',
+				outputDirectory: 'dist/app/windows/ia32',
+				iconUrl: "https://raw.githubusercontent.com/PalmerAL/min/master/icons/icon256.ico",
+				setupIcon: "icons/icon256.ico",
+				authors: "Min team",
+				description: "A smarter, faster web browser",
+				exe: 'min.exe',
+			},
+			x64: {
+				appDirectory: 'dist/app/Min-win32-x64',
+				outputDirectory: 'dist/app/windows/x64',
+				iconUrl: "https://raw.githubusercontent.com/PalmerAL/min/master/icons/icon256.ico",
+				setupIcon: "icons/icon256.ico",
+				authors: "Min team",
+				description: "A smarter, faster web browser",
+				exe: 'min.exe'
+			}
+		},
 	});
 
 	grunt.loadNpmTasks('grunt-contrib-concat');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-electron');
+	grunt.loadNpmTasks('grunt-electron-installer');
 	grunt.loadNpmTasks('grunt-electron-installer-debian');
 
 	grunt.registerTask('default', ['concat:browser', 'uglify:browser', 'concat:webview', 'uglify:webview', 'concat:main']);
 	grunt.registerTask('browser', ['concat:browser', 'uglify:browser']);
 	grunt.registerTask('webview', ['concat:webview', 'uglify:webview']);
-	grunt.registerTask('build', ['concat:browser', 'uglify:browser', 'concat:webview', 'uglify:webview', 'concat:main', 'electron:osxBuild', 'electron:windowsBuild', 'electron:linuxBuild', 'electron-installer-debian:linux32', 'electron-installer-debian:linux64'])
+	grunt.registerTask('build', ['concat:browser', 'uglify:browser', 'concat:webview', 'uglify:webview', 'concat:main', 'electron:osxBuild', 'electron:windowsBuild', 'electron:linuxBuild', 'electron-installer-debian:linux32', 'electron-installer-debian:linux64', 'create-windows-installer:ia32', 'create-windows-installer:x64'])
+	grunt.registerTask('windowsBuild', ['concat:browser', 'uglify:browser', 'concat:webview', 'uglify:webview', 'create-windows-installer:ia32', 'create-windows-installer:x64'])
 
 };
