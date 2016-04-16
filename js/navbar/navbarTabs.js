@@ -25,7 +25,7 @@ function setActiveTabElement(tabId) {
 	var el = getTabElement(tabId);
 	el.classList.add("active");
 
-	if (tabs.count() > 1) { //if there is only one tab, we don't need to indicate which one is selected
+	if (currentTask.tabs.count() > 1) { //if there is only one tab, we don't need to indicate which one is selected
 		el.classList.add("has-highlight");
 	} else {
 		el.classList.remove("has-highlight");
@@ -69,7 +69,7 @@ function enterEditMode(tabId) {
 	var tabEl = getTabElement(tabId);
 	var webview = getWebview(tabId);
 
-	var currentURL = tabs.get(tabId).url;
+	var currentURL = currentTask.tabs.get(tabId).url;
 
 	if (currentURL == "about:blank") {
 		currentURL = "";
@@ -96,7 +96,7 @@ function enterEditMode(tabId) {
 
 function rerenderTabElement(tabId) {
 	var tabEl = getTabElement(tabId),
-		tabData = tabs.get(tabId);
+		tabData = currentTask.tabs.get(tabId);
 
 	var tabTitle = tabData.title || "New Tab";
 	var title = tabEl.querySelector(".tab-view-contents .title");
@@ -120,7 +120,7 @@ function rerenderTabElement(tabId) {
 }
 
 function createTabElement(tabId) {
-	var data = tabs.get(tabId),
+	var data = currentTask.tabs.get(tabId),
 		url = urlParser.parse(data.url);
 
 	var tabEl = document.createElement("div");
@@ -219,7 +219,7 @@ function createTabElement(tabId) {
 			openURLFromsearchbar(e, this.value);
 
 			//focus the webview, so that autofocus inputs on the page work
-			getWebview(tabs.getSelected()).focus();
+			getWebview(currentTask.tabs.getSelected()).focus();
 
 		} else if (e.keyCode == 9) {
 			return;
@@ -257,7 +257,7 @@ function createTabElement(tabId) {
 		var tabId = this.getAttribute("data-tab");
 
 		//if the tab isn't focused
-		if (tabs.getSelected() != tabId) {
+		if (currentTask.tabs.getSelected() != tabId) {
 			switchToTab(tabId);
 		} else if (!isExpandedMode) { //the tab is focused, edit tab instead
 			enterEditMode(tabId);
@@ -306,19 +306,19 @@ function addTab(tabId, options) {
 		leaveTabEditMode(); //if a tab is in edit-mode, we want to exit it
 	}
 
-	tabId = tabId || tabs.add();
+	tabId = tabId || currentTask.tabs.add();
 
-	var tab = tabs.get(tabId);
+	var tab = currentTask.tabs.get(tabId);
 
 	//use the correct new tab colors
 
 	if (tab.private && !tab.backgroundColor) {
-		tabs.update(tabId, {
+		currentTask.tabs.update(tabId, {
 			backgroundColor: defaultColors.private[0],
 			foregroundColor: defaultColors.private[1]
 		});
 	} else if (!tab.backgroundColor) {
-		tabs.update(tabId, {
+		currentTask.tabs.update(tabId, {
 			backgroundColor: defaultColors.regular[0],
 			foregroundColor: defaultColors.regular[1]
 		});
@@ -326,7 +326,7 @@ function addTab(tabId, options) {
 
 	findinpage.end();
 
-	var index = tabs.getIndex(tabId);
+	var index = currentTask.tabs.getIndex(tabId);
 
 	var tabEl = createTabElement(tabId);
 

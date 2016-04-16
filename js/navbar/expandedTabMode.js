@@ -18,7 +18,7 @@ require.async("dragula", function (dragula) {
 			tabOrder.push(tabId);
 		}
 
-		tabs.reorder(tabOrder);
+		currentTask.tabs.reorder(tabOrder);
 	});
 
 });
@@ -30,7 +30,7 @@ tabContainer.addEventListener("mousewheel", function (e) {
 	}
 });
 
-//event listener added in navbarTabs.js
+//event listener added in navbarcurrentTask.tabs.js
 function handleExpandedModeTabItemHover(e) {
 	if (isExpandedMode) {
 		var item = this;
@@ -53,7 +53,7 @@ function enterExpandedMode() {
 
 		//get the subtitles
 
-		tabs.get().forEach(function (tab) {
+		currentTask.tabs.get().forEach(function (tab) {
 			var prettyURL = urlParser.prettyURL(tab.url);
 
 			console.log(tab);
@@ -86,6 +86,6 @@ function leaveExpandedMode() {
 tabContainer.addEventListener("click", function () {
 	if (isExpandedMode) {
 		leaveExpandedMode();
-		getWebview(tabs.getSelected()).focus();
+		getWebview(currentTask.tabs.getSelected()).focus();
 	}
 });
