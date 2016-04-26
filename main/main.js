@@ -98,6 +98,31 @@ app.on('ready', function () {
 
 });
 
+//quit when squirrel expects it. From https://github.com/electron/grunt-electron-installer
+var handleStartupEvent = function () {
+	if (process.platform !== 'win32') {
+		return false;
+	}
+
+	var squirrelCommand = process.argv[1];
+	switch (squirrelCommand) {
+		case '--squirrel-install':
+		case '--squirrel-updated':
+			app.quit();
+			return true;
+		case '--squirrel-uninstall':
+			app.quit();
+			return true;
+		case '--squirrel-obsolete':
+			app.quit();
+			return true;
+	}
+};
+
+if (handleStartupEvent()) {
+	return;
+}
+
 
 function createAppMenu() {
 	// create the menu. based on example from http://electron.atom.io/docs/v0.34.0/api/menu/
