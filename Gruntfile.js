@@ -179,6 +179,6 @@ module.exports = function (grunt) {
 	grunt.registerTask('browser', ['concat:browser', 'uglify:browser']);
 	grunt.registerTask('webview', ['concat:webview', 'uglify:webview']);
 	grunt.registerTask('build', ['concat:browser', 'uglify:browser', 'concat:webview', 'uglify:webview', 'concat:main', 'electron:osxBuild', 'electron:windowsBuild', 'electron:linuxBuild', 'electron-installer-debian:linux32', 'electron-installer-debian:linux64', 'create-windows-installer:ia32', 'create-windows-installer:x64'])
-	grunt.registerTask('windowsBuild', ['concat:browser', 'uglify:browser', 'concat:webview', 'uglify:webview', 'create-windows-installer:ia32', 'create-windows-installer:x64'])
+	grunt.registerTask('windowsBuild', ['concat:browser', 'uglify:browser', 'concat:webview', 'uglify:webview', 'electron:windowsBuild', 'create-windows-installer:ia32', 'create-windows-installer:x64'])
 
 };
