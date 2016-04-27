@@ -142,9 +142,7 @@ var handleStartupEvent = function () {
 	}
 };
 
-if (handleStartupEvent()) {
-	return;
-}
+handleStartupEvent();
 
 
 function createAppMenu() {
