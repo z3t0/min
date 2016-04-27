@@ -104,8 +104,12 @@ module.exports = function (grunt) {
 					'app-version': version,
 					platform: 'win32',
 					arch: 'all',
+					icon: "icons/icon256.ico",
 					ignore: 'dist/app',
 					overwrite: true,
+					"version-string": {
+						ProductName: "Min",
+					},
 				}
 			},
 			linuxBuild: {
