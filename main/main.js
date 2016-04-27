@@ -108,7 +108,30 @@ var handleStartupEvent = function () {
 	switch (squirrelCommand) {
 		case '--squirrel-install':
 		case '--squirrel-updated':
-			app.quit();
+
+			//create windows shortcuts
+			//from https: //github.com/electron/grunt-electron-installer/issues/87#issuecomment-166970736
+
+			var path = require("path");
+			var childProcess = require("child_process");
+
+			function exeSquirrelCommand(args, cb) {
+				var updateDotExe = path.resolve(path.dirname(process.execPath), '..', 'update.exe');
+				var child = childProcess.spawn(updateDotExe, args, {
+					detached: true
+				});
+				child.on('close', function () {
+					cb();
+				});
+			};
+
+			function install(cb) {
+				var target = path.basename(process.execPath);
+				exeSquirrelCommand(["--createShortcut", target], cb);
+			};
+
+			install(app.quit);
+
 			return true;
 		case '--squirrel-uninstall':
 			app.quit();
