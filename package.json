@@ -12,13 +12,15 @@
     "string_score": "^0.1.22"
   },
   "devDependencies": {
+    "browserify": "^14.3.0",
     "grunt": "^1.0.1",
     "grunt-contrib-concat": "^1.0.1",
     "grunt-contrib-uglify": "^2.0.0",
     "grunt-contrib-watch": "^1.0.0",
     "grunt-electron": "^5.0.0",
     "grunt-electron-installer-debian": "^0.4.0",
-    "standard": "^7.1.0"
+    "standard": "^7.1.0",
+    "webpack": "^2.3.3"
   },
   "license": "Apache-2.0",
   "scripts": {
