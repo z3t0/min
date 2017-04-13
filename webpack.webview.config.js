@@ -1,10 +1,10 @@
 var path = require('path');
 
 module.exports = {
-  entry: './main/main.js',
-  target: 'electron-main',
+  entry: './js/webview.js',
+  target: 'electron',
   output: {
-    filename: 'bundle.js',
+    filename: 'webview.bundle.js',
     path: path.resolve(__dirname, 'dist')
   }
 };

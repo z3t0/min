@@ -75,7 +75,7 @@ remote.session.defaultSession.setPermissionRequestHandler(pagePermissionRequestH
 
 function getWebviewDom (options) {
   var w = document.createElement('webview')
-  w.setAttribute('preload', 'dist/webview.min.js')
+  w.setAttribute('preload', 'dist/webview.bundle.js')
 
   if (options.url) {
     w.setAttribute('src', urlParser.parse(options.url))
